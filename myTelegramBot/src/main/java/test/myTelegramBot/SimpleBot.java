@@ -31,23 +31,45 @@ public class SimpleBot extends TelegramLongPollingBot
 	{
         super(options);
     }
+	
+	private SimpleBot() 
+	{
+        super();
+    }
  
 	public static void main(String[] args) 
 	{
-		HttpHost proxy = new HttpHost("172.22.4.1", 8080);
-	    RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
-	    DefaultBotOptions options = new DefaultBotOptions();
-	    options.setRequestConfig(config);
-	    
-		ApiContextInitializer.init();
-		TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
-		try 
-		{ 
-			telegramBotsApi.registerBot(new SimpleBot(options));
-		} 
-		catch (TelegramApiException e) 
+		boolean isProxyNeeded = false;
+		if (isProxyNeeded)
 		{
-			e.printStackTrace();
+			HttpHost proxy = new HttpHost("172.22.4.1", 8080);
+		    RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+		    DefaultBotOptions options = new DefaultBotOptions();
+		    options.setRequestConfig(config);
+		    
+			ApiContextInitializer.init();
+			TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
+			try 
+			{ 
+				telegramBotsApi.registerBot(new SimpleBot(options));
+			} 
+			catch (TelegramApiException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			ApiContextInitializer.init();
+			TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
+			try 
+			{ 
+				telegramBotsApi.registerBot(new SimpleBot());
+			} 
+			catch (TelegramApiException e) 
+			{
+				e.printStackTrace();
+			}
 		}
 	}
  

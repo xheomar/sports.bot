@@ -23,28 +23,7 @@ public class App
 	private static final String SportsRuUrlTemplate = 
 			"http://www.sports.ru/api/comment/get/message.json?message_class=Sports%3A%3ABlog%3A%3APost%3A%3APost&new_time=1&style=newjs&from_id=undefined&";
 	//private static final String SportsRuUrlTemplate = "http://www.sports.ru/api/comment/get/message.json?order_type=old&limit=100&message_class=Sports%3A%3ABlog%3A%3APost%3A%3APost&new_time=1&style=newjs&message_id=1055829689";
-	   
-	public static void main(String[] args) 
-	{
-		App app = new App();
-		System.out.println("Running App");
-		//int temp = app.runApp();
-		//System.out.println("Got the result = " + temp);
-	}
-	
-	/*public int runApp()
-    {    	
-		int temp = 0;
-    	SportsMessages messages = getSportsMessages(0);
-		if (messages != null)
-    	{
-			temp = messages.getData().getComments().size();
-			System.out.println(messages.getData().getTotalCount());
-    	}
-    	return temp;
-			
-    }*/
-	
+	   	
 	public SportsMessages getSportsMessages(int start, String publicId) 
 	{
 		CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -58,13 +37,21 @@ public class App
 			url = new String(SportsRuUrlTemplate + "message_id=" + publicId + "&" + "order_type=new&limit=5");
 		}
 		
-		System.out.println("Connecting to " + url + "...");
-		HttpHost proxy = new HttpHost("172.22.4.1", 8080);
-		RequestConfig config = RequestConfig.custom()
-                .setProxy(proxy)
-                .build();
+		System.out.println("Connecting to " + url + "...");	
+		
+		boolean isProxyNeeded = false;
 		HttpGet request = new HttpGet(url);
-		request.setConfig(config);
+		
+		if (isProxyNeeded)
+		{
+			HttpHost proxy = new HttpHost("172.22.4.1", 8080);
+			RequestConfig config = RequestConfig.custom()
+	                .setProxy(proxy)
+	                .build();
+		
+			request.setConfig(config);
+		}
+			
 		CloseableHttpResponse response;
 		try 
 		{
@@ -117,7 +104,7 @@ public class App
 			answer = new String("\n" + "``` >>> " + answerTopicCaster + ": " + answerText + "```" + "\n");
 		}
 		
-		message = topic + " " + time + 	topicCaster + " :" + "\n*" + text + "*\n";	
+		message = topic + " " + "\n" + time + answer + topicCaster + " :" + "\n*" + text + "*\n";	
 		
 		return message;
 	}
