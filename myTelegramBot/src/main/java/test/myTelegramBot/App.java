@@ -98,7 +98,6 @@ public class App
 		String time = new String(comment.getCTime().getTime() + " " + comment.getCTime().getDate() + "\n");
 		if (comment.getAnswerTo() != null)
 		{
-			// Имеем дело с отвеченным сообщением
 			String answerText = comment.getAnswerTo().getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("_", "").replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
 			String answerTopicCaster = new String(comment.getAnswerTo().getUser().getName().replaceAll(" ", ""));
 			answer = new String("\n" + "``` >>> " + answerTopicCaster + ": " + answerText + "```" + "\n");

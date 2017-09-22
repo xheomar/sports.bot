@@ -128,7 +128,6 @@ public class SimpleBot extends TelegramLongPollingBot
 								}
 								List<Comment> listComment = (List) Lists.reverse(messages.getData().getComments());
 								
-								// Рисуем лог комментов в первый раз
 								if (LIST_OF_STARTS[publicId] == 0)
 								{								
 									for (Comment comment: listComment)
@@ -141,20 +140,17 @@ public class SimpleBot extends TelegramLongPollingBot
 								}
 								else
 								{									
-									System.out.println("Новые комменты?...");
-									// Новые комменты
+									System.out.println("New comments?...");
 									boolean allowed = false;
 									for (Comment comment: listComment)
 									{
 										if (!allowed && comment.getId() != LIST_OF_LAST_MESSAGES[publicId])
 										{
-											// Эти комменты уже были отправлены
 											System.out.println(comment.getId() + "!=" + LIST_OF_LAST_MESSAGES[publicId]);
 											continue;
 										}
 										else
 										{
-											// Это последний отправленный
 											if (allowed == false)
 											{
 												allowed = true;	
@@ -170,22 +166,19 @@ public class SimpleBot extends TelegramLongPollingBot
 									}
 									if(!allowed)
 									{
-										// Если мы не нашли последний отправленный, то он либо
-										// удален, либо перекрыт другими. Пофиг, пишем по-новой!
 										LIST_OF_STARTS[publicId] = 0;
 									}
 								}								
 							}
-							sendMsg(message, "Вы отписались от новостей");
+							sendMsg(message, "You has been unsubscribed");
 						}
 					}.start();
-					sendMsg(message, "Я подписал вас на новости");
+					sendMsg(message, "You has been subscribed");
 				}
 				else if (message.getText() != null && message.getText().equals("/stop")) 
 				{
 					isRunning = false;
 				}
-				// Ждем имя канала, где мы админы
 				else if (message.getText().startsWith("@") && !message.getText().trim().contains(" "))
 				{
 					sendMessageToChannel(message, message.getText());
@@ -198,7 +191,7 @@ public class SimpleBot extends TelegramLongPollingBot
 		}
 		else 
 		{
-			sendMsg(message, "Извините, но вы - не мой админ :(");
+			sendMsg(message, "You are not my admin :(");
 		}
 	}
 	
