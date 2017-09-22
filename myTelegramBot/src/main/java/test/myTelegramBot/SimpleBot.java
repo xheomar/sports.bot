@@ -112,8 +112,8 @@ public class SimpleBot extends TelegramLongPollingBot
 									for (Comment comment: listComment)
 									{
 										LIST_OF_LAST_MESSAGES[publicId] = comment.getId();
-										//sendMessageToChannel(message, app.getMessageFromComment(comment));
-										sendMsg(message, app.getMessageFromComment(comment));
+										sendMessageToChannel(message, app.getMessageFromComment(comment));
+										//sendMsg(message, app.getMessageFromComment(comment));
 									}
 									LIST_OF_STARTS[publicId] += 1;
 								}
@@ -140,8 +140,8 @@ public class SimpleBot extends TelegramLongPollingBot
 											else
 											{
 												LIST_OF_LAST_MESSAGES[publicId] = comment.getId();
-												// sendMessageToChannel(message, app.getMessageFromComment(comment));
-												sendMsg(message, app.getMessageFromComment(comment));
+												sendMessageToChannel(message, app.getMessageFromComment(comment));
+												//sendMsg(message, app.getMessageFromComment(comment));
 											}
 											
 										}									
