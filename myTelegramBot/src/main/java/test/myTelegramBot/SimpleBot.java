@@ -30,6 +30,9 @@ public class SimpleBot extends TelegramLongPollingBot
 	private static final String SET_NEW_1 = "/setNew1";
 	private static final String SET_NEW_2 = "/setNew2";
 	private static final String SET_NEW_3 = "/setNew3";
+	private static final String TOP_1 = "/top1";
+	private static final String TOP_2 = "/top2";
+	private static final String TOP_3 = "/top3";
 	private volatile String [] LIST_OF_PUBLICS = {"1412670", "1412898", "1414425"};
 	private volatile String [] BLACK_LIST = {""};
 	private volatile long [] LIST_OF_LAST_MESSAGES = {0, 0, 0};
@@ -173,6 +176,7 @@ public class SimpleBot extends TelegramLongPollingBot
 			if (message != null && message.hasText()) 
 			{
 				System.out.println("Received the message: " + message.getText());
+				
 				if (message.getText().startsWith(SET_NEW_1)) 
 				{
 					String newPublicId_1 = message.getText().split(" ")[1];
@@ -200,6 +204,23 @@ public class SimpleBot extends TelegramLongPollingBot
 					props.setProperty("id3", newPublicId_3);
 					saveProperties();
 				}
+				
+				if (message.getText().startsWith(TOP_1) || message.getText().startsWith(TOP_2) || message.getText().startsWith(TOP_3)) 
+				{
+					App app = new App();
+					int id = Integer.parseInt(message.getText().replaceAll("/top", ""));
+					SportsMessages topMessages = app.getSportsMessages(2, LIST_OF_PUBLICS[id-1]);
+					List<Comment> listComment = (List) Lists.reverse(topMessages.getData().getComments());
+					String topComments = "";
+					
+					for (Comment comment: listComment)
+					{
+						topComments += app.getTopComments(comment);
+						topComments += "\n";
+					}
+					sendMsg(message, topComments);
+				}
+				
 				if (message.getText().equals("/start") || message.getText().equals("/startDebug")) 
 				{
 					if (message.getText().equals("/start")) isDebug = false;

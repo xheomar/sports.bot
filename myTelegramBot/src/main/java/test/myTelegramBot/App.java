@@ -24,17 +24,26 @@ public class App
 			"http://www.sports.ru/api/comment/get/message.json?message_class=Sports%3A%3ABlog%3A%3APost%3A%3APost&new_time=1&style=newjs&from_id=undefined&";
 	//private static final String SportsRuUrlTemplate = "http://www.sports.ru/api/comment/get/message.json?order_type=old&limit=100&message_class=Sports%3A%3ABlog%3A%3APost%3A%3APost&new_time=1&style=newjs&message_id=1055829689";
 	   	
-	public SportsMessages getSportsMessages(int start, String publicId) 
+	/*
+	 * KEY = 0: 100 oldest messages
+	 * KEY = 1: 5 newest messages
+	 * KEY = 2: TOP-10 messages 
+	 */
+	public SportsMessages getSportsMessages(int key, String publicId) 
 	{
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		String url = "";		
-		if (start == 0)
+		if (key == 0)
 		{
 			url = new String(SportsRuUrlTemplate + "message_id=" + publicId + "&" + "order_type=old&limit=100");	
 		}
-		else if (start == 1)
+		else if (key == 1)
 		{
 			url = new String(SportsRuUrlTemplate + "message_id=" + publicId + "&" + "order_type=new&limit=5");
+		}
+		else if (key == 2)
+		{
+			url = new String(SportsRuUrlTemplate + "message_id=" + publicId + "&" + "order_type=top10&limit=10");
 		}
 		
 		System.out.println("Connecting to " + url + "...");	
@@ -92,6 +101,8 @@ public class App
 		String message = "";
 		String answer = "";
 		String text = comment.getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
+		// delete all hrefs
+		text = text.replaceAll("<a(.*?)>", "").replaceAll("<\\/a>", "");
 		String topicCaster = new String(comment.getUser().getName());
 		String hashTagTopicCaster = new String("#" + comment.getUser().getName().replaceAll(" ", ""));
 		String hashTagTopic = new String("#" + comment.getMessageInfo().getName().replaceAll(" ", "") + 
@@ -107,6 +118,30 @@ public class App
 		// message = topic + " " + "\n" + time + answer + topicCaster + " :" + "\n*" + text + "*\n";
 		
 		message = "*" + topicCaster + ": " + text + "*\n" + answer + "\n" + time + " " + hashTagTopicCaster + " " + hashTagTopic;
+		
+		return message;
+	}
+
+	public String getTopComments(Comment comment) 
+	{
+		String message = "";
+		String answer = "";
+		String text = comment.getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
+		// delete all hrefs
+		text = text.replaceAll("<a(.*?)>", "").replaceAll("<\\/a>", "");
+		String topicCaster = new String(comment.getUser().getName());
+		String time = new String(comment.getCTime().getTime() + " " + comment.getCTime().getDate());
+		String rating = new String("+" + comment.getRating().getPlus() + " -" + comment.getRating().getMinus());
+		if (comment.getAnswerTo() != null)
+		{
+			String answerText = comment.getAnswerTo().getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("_", "").replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
+			String answerTopicCaster = new String(comment.getAnswerTo().getUser().getName().replaceAll(" ", ""));
+			answer = new String("``` >>> " + answerTopicCaster + ": " + answerText + "```" + "\n");
+		}
+		
+		message = "*" + topicCaster + ":*\n" 
+				+ rating + " " + time + "\n"	  
+				+ text + "\n" + answer + "\n";
 		
 		return message;
 	}
