@@ -93,7 +93,7 @@ public class App
 		String answer = "";
 		String text = comment.getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
 		String topicCaster = new String(comment.getUser().getName());
-		String hashTagTopicCaster = new String("\n#" + comment.getUser().getName().replaceAll(" ", ""));
+		String hashTagTopicCaster = new String("#" + comment.getUser().getName().replaceAll(" ", ""));
 		String hashTagTopic = new String("#" + comment.getMessageInfo().getName().replaceAll(" ", "") + 
 				" " + '[' + "link" + ']' + '(' + comment.getMessageInfo().getLink() + ')');
 		String time = new String(comment.getCTime().getTime() + " " + comment.getCTime().getDate());
@@ -106,7 +106,7 @@ public class App
 		
 		// message = topic + " " + "\n" + time + answer + topicCaster + " :" + "\n*" + text + "*\n";
 		
-		message = "*" + topicCaster + ": " + text + "*\n" + answer + "\n" + time + " " + hashTagTopicCaster + hashTagTopic;
+		message = "*" + topicCaster + ": " + text + "*\n" + answer + "\n" + time + " " + hashTagTopicCaster + " " + hashTagTopic;
 		
 		return message;
 	}

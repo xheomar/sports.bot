@@ -31,6 +31,7 @@ public class SimpleBot extends TelegramLongPollingBot
 	private static final String SET_NEW_2 = "/setNew2";
 	private static final String SET_NEW_3 = "/setNew3";
 	private volatile String [] LIST_OF_PUBLICS = {"1412670", "1412898", "1414425"};
+	private volatile String [] BLACK_LIST = {""};
 	private volatile long [] LIST_OF_LAST_MESSAGES = {0, 0, 0};
 	private volatile int [] LIST_OF_STARTS = {0, 0, 0};
 	private static final int ADMIN_USERID = 17872630;
@@ -111,6 +112,15 @@ public class SimpleBot extends TelegramLongPollingBot
 		    LIST_OF_PUBLICS[2] = id3;
 		    
 		    System.out.println("The following IDs were read: " + id1 + " " + id2 + " " + id3);
+		    
+		    String blackList = props.getProperty("blackList");
+		    BLACK_LIST = blackList.split(",");
+		    
+		    System.out.print("The following users were muted: ");
+		    for (String blacked: BLACK_LIST)
+		    {
+		    	System.out.print(blacked + " ");
+		    }
 		    
 		    reader.close();
 		} 
@@ -230,14 +240,17 @@ public class SimpleBot extends TelegramLongPollingBot
 								{								
 									for (Comment comment: listComment)
 									{
-										LIST_OF_LAST_MESSAGES[publicId] = comment.getId();
-										if (isDebug)
+										if (!isBlackListed(comment))
 										{
-											sendMsg(message, app.getMessageFromComment(comment));
-										}
-										else
-										{
-											sendMessageToChannel(message, app.getMessageFromComment(comment));
+											LIST_OF_LAST_MESSAGES[publicId] = comment.getId();
+											if (isDebug)
+											{
+												sendMsg(message, app.getMessageFromComment(comment));
+											}
+											else
+											{
+												sendMessageToChannel(message, app.getMessageFromComment(comment));
+											}	
 										}
 									}
 									LIST_OF_STARTS[publicId] += 1;
@@ -248,31 +261,34 @@ public class SimpleBot extends TelegramLongPollingBot
 									boolean allowed = false;
 									for (Comment comment: listComment)
 									{
-										if (!allowed && comment.getId() != LIST_OF_LAST_MESSAGES[publicId])
+										if (!isBlackListed(comment))
 										{
-											System.out.println(comment.getId() + "!=" + LIST_OF_LAST_MESSAGES[publicId]);
-											continue;
-										}
-										else
-										{
-											if (allowed == false)
+											if (!allowed && comment.getId() != LIST_OF_LAST_MESSAGES[publicId])
 											{
-												allowed = true;	
+												System.out.println(comment.getId() + "!=" + LIST_OF_LAST_MESSAGES[publicId]);
+												continue;
 											}
 											else
 											{
-												LIST_OF_LAST_MESSAGES[publicId] = comment.getId();
-												if (isDebug)
+												if (allowed == false)
 												{
-													sendMsg(message, app.getMessageFromComment(comment));
+													allowed = true;	
 												}
 												else
 												{
-													sendMessageToChannel(message, app.getMessageFromComment(comment));
+													LIST_OF_LAST_MESSAGES[publicId] = comment.getId();
+													if (isDebug)
+													{
+														sendMsg(message, app.getMessageFromComment(comment));
+													}
+													else
+													{
+														sendMessageToChannel(message, app.getMessageFromComment(comment));
+													}
 												}
+												
 											}
-											
-										}									
+										}
 									}
 									if(!allowed)
 									{
@@ -305,6 +321,19 @@ public class SimpleBot extends TelegramLongPollingBot
 		}
 	}
 	
+	protected boolean isBlackListed(Comment comment) 
+	{
+	    for (String blacked: BLACK_LIST)
+	    {
+	    	if (comment.getUser().getName().equalsIgnoreCase(blacked) ||
+	    			(comment.getAnswerTo() != null && comment.getAnswerTo().getUser().getName().equalsIgnoreCase(blacked)))
+			{
+				return true;
+			}
+	    }
+		return false;
+	}
+
 	private void sendMessageToChannel(Message message, String text) 
 	{
         SendMessage sendMessage = new SendMessage();
