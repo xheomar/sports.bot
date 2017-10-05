@@ -35,10 +35,12 @@ public class SimpleBot extends TelegramLongPollingBot
 	private static final String TOP_3 = "/top3";
 	private volatile String [] LIST_OF_PUBLICS = {"1412670", "1412898", "1414425"};
 	private volatile String [] BLACK_LIST = {""};
+	private volatile String [] WHITE_LIST = {""};
 	private volatile long [] LIST_OF_LAST_MESSAGES = {0, 0, 0};
 	private volatile int [] LIST_OF_STARTS = {0, 0, 0};
 	private static final int ADMIN_USERID = 17872630;
 	private static final String PUBLIC_CHANNEL = "@systemfootball";
+	private static final String THE_BEST_PUBLIC_CHANNEL = "@sportsruthebest";
 	private volatile boolean isRunning = true;
 	private volatile boolean isDebug = false; 
 	
@@ -123,6 +125,15 @@ public class SimpleBot extends TelegramLongPollingBot
 		    for (String blacked: BLACK_LIST)
 		    {
 		    	System.out.print(blacked + " ");
+		    }
+		    
+		    String whiteList = props.getProperty("whiteList");
+		    WHITE_LIST = whiteList.split(",");
+		    
+		    System.out.print("The following users were added to white list: ");
+		    for (String whites: WHITE_LIST)
+		    {
+		    	System.out.print(whites + " ");
 		    }
 		    
 		    reader.close();
@@ -270,7 +281,11 @@ public class SimpleBot extends TelegramLongPollingBot
 											}
 											else
 											{
-												sendMessageToChannel(message, app.getMessageFromComment(comment));
+												sendMessageToChannel(PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
+												if (isWhiteListed(comment))
+												{
+													sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
+												}
 											}	
 										}
 									}
@@ -304,7 +319,11 @@ public class SimpleBot extends TelegramLongPollingBot
 													}
 													else
 													{
-														sendMessageToChannel(message, app.getMessageFromComment(comment));
+														sendMessageToChannel(PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
+														if (isWhiteListed(comment))
+														{
+															sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
+														}
 													}
 												}
 												
@@ -326,10 +345,10 @@ public class SimpleBot extends TelegramLongPollingBot
 				{
 					isRunning = false;
 				}
-				else if (message.getText().startsWith("@") && !message.getText().trim().contains(" "))
+				/* else if (message.getText().startsWith("@") && !message.getText().trim().contains(" "))
 				{
 					sendMessageToChannel(message, message.getText());
-				}
+				}*/
 				else
 				{
 					System.out.println(message.getFrom().getUserName() + " " + message.getFrom().getId());
@@ -354,12 +373,24 @@ public class SimpleBot extends TelegramLongPollingBot
 	    }
 		return false;
 	}
+	
+	protected boolean isWhiteListed(Comment comment) 
+	{
+	    for (String whites: WHITE_LIST)
+	    {
+	    	if (comment.getUser().getName().equalsIgnoreCase(whites))
+			{
+				return true;
+			}
+	    }
+		return false;
+	}
 
-	private void sendMessageToChannel(Message message, String text) 
+	private void sendMessageToChannel(String channelAddress, Message message, String text) 
 	{
         SendMessage sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(PUBLIC_CHANNEL);
+        sendMessage.setChatId(channelAddress);
         sendMessage.setText(text);
         System.out.println("Sent the message: " + text);
         try 
