@@ -100,6 +100,7 @@ public class App
 	{
 		String message = "";
 		String answer = "";
+		String hashTagAnswerTopicCaster = "";
 		String text = comment.getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
 		// delete all hrefs
 		text = text.replaceAll("<a(.*?)>", "").replaceAll("<\\/a>", "");
@@ -112,12 +113,13 @@ public class App
 		{
 			String answerText = comment.getAnswerTo().getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("_", "").replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
 			String answerTopicCaster = new String(comment.getAnswerTo().getUser().getName().replaceAll(" ", ""));
+			hashTagAnswerTopicCaster = new String("#" + answerTopicCaster);
 			answer = new String("``` >>> " + answerTopicCaster + ": " + answerText + "```" + "\n");
 		}
 		
 		// message = topic + " " + "\n" + time + answer + topicCaster + " :" + "\n*" + text + "*\n";
 		
-		message = "*" + topicCaster + ": " + text + "*\n" + answer + "\n" + time + " " + hashTagTopicCaster + " " + hashTagTopic;
+		message = "*" + topicCaster + ": " + text + "*\n" + answer + "\n" + time + " " + hashTagTopicCaster + " "  + hashTagAnswerTopicCaster + " " + hashTagTopic;
 		
 		return message;
 	}
