@@ -382,6 +382,7 @@ public class SimpleBot extends TelegramLongPollingBot
 											sendMessageToChannel(SUBBSCRIPTIONS_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
 											sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
 										}
+										LIST_OF_STARTS[publicId] = 0;
 										getProperties();
 									}
 								} 
