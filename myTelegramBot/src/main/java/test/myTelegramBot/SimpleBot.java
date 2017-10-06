@@ -28,12 +28,14 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 public class SimpleBot extends TelegramLongPollingBot 
 {	
 	private static final String ADMIN_USERNAME = "Heorhi";
-	private static final String SET_NEW_1 = "/setNew1";
-	private static final String SET_NEW_2 = "/setNew2";
-	private static final String SET_NEW_3 = "/setNew3";
+	private static final String SET_NEW_1 = "/set1";
+	private static final String SET_NEW_2 = "/set2";
+	private static final String SET_NEW_3 = "/set3";
+	private static final String SET_NEW_4 = "/set4";
 	private static final String TOP_1 = "/top1";
 	private static final String TOP_2 = "/top2";
 	private static final String TOP_3 = "/top3";
+	private static final String TOP_4 = "/top4";
 	private volatile String [] LIST_OF_PUBLICS = {"", "", "", ""};
 	private volatile String [] LIST_OF_NAMES = {"", "", "", ""};
 	private volatile String [] BLACK_LIST = {""};
@@ -229,6 +231,15 @@ public class SimpleBot extends TelegramLongPollingBot
 					LIST_OF_STARTS[2] = 0;
 					sendMsg(message, "New 3rd public is set to " + newPublicId_3);
 					props.setProperty("id2", newPublicId_3);
+					saveProperties();
+				}
+				if (message.getText().startsWith(SET_NEW_4)) 
+				{
+					String newPublicId_4 = message.getText().split(" ")[1];
+					LIST_OF_PUBLICS[3] = newPublicId_4;
+					LIST_OF_STARTS[3] = 0;
+					sendMsg(message, "New 4th public is set to " + newPublicId_4);
+					props.setProperty("id3", newPublicId_4);
 					saveProperties();
 				}
 				
