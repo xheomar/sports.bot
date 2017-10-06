@@ -271,7 +271,7 @@ public class SimpleBot extends TelegramLongPollingBot
 									e1.printStackTrace();
 								}
 								
-								if (publicId == 3)
+								if (publicId == 4)
 								{
 									publicId = 0;
 								}
