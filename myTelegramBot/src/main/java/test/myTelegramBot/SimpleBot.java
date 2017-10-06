@@ -13,6 +13,7 @@ import java.util.Properties;
 import jersey.repackaged.com.google.common.collect.Lists;
 import test.myTelegramBot.json.Comment;
 import test.myTelegramBot.json.SportsMessages;
+import test.myTelegramBot.xml.XmlItem;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
@@ -33,14 +34,16 @@ public class SimpleBot extends TelegramLongPollingBot
 	private static final String TOP_1 = "/top1";
 	private static final String TOP_2 = "/top2";
 	private static final String TOP_3 = "/top3";
-	private volatile String [] LIST_OF_PUBLICS = {"1412670", "1412898", "1414425"};
+	private volatile String [] LIST_OF_PUBLICS = {"", "", "", ""};
+	private volatile String [] LIST_OF_NAMES = {"", "", "", ""};
 	private volatile String [] BLACK_LIST = {""};
 	private volatile String [] WHITE_LIST = {""};
-	private volatile long [] LIST_OF_LAST_MESSAGES = {0, 0, 0};
-	private volatile int [] LIST_OF_STARTS = {0, 0, 0};
+	private volatile long [] LIST_OF_LAST_MESSAGES = {0, 0, 0, 0};
+	private volatile int [] LIST_OF_STARTS = {0, 0, 0, 0};
 	private static final int ADMIN_USERID = 17872630;
 	private static final String PUBLIC_CHANNEL = "@systemfootball";
 	private static final String THE_BEST_PUBLIC_CHANNEL = "@sportsruthebest";
+	private static final String SUBBSCRIPTIONS_PUBLIC_CHANNEL = "@sportsrusubscriptions";
 	private volatile boolean isRunning = true;
 	private volatile boolean isDebug = false; 
 	
@@ -109,14 +112,27 @@ public class SimpleBot extends TelegramLongPollingBot
 		    
 		    props.load(reader);
 		 
+		    String id0 = props.getProperty("id0");
+		    LIST_OF_PUBLICS[0] = id0;
 		    String id1 = props.getProperty("id1");
-		    LIST_OF_PUBLICS[0] = id1;
+		    LIST_OF_PUBLICS[1] = id1;
 		    String id2 = props.getProperty("id2");
-		    LIST_OF_PUBLICS[1] = id2;
+		    LIST_OF_PUBLICS[2] = id2;
 		    String id3 = props.getProperty("id3");
-		    LIST_OF_PUBLICS[2] = id3;
+		    LIST_OF_PUBLICS[3] = id3;
 		    
-		    System.out.println("The following IDs were read: " + id1 + " " + id2 + " " + id3);
+		    System.out.println("The following IDs were read: " + id0 + " " + id1 + " " + id2 + " " + id3);
+		    
+		    String name0 = props.getProperty("name0");
+		    LIST_OF_NAMES[0] = name0;
+		    String name1 = props.getProperty("name1");
+		    LIST_OF_NAMES[1] = name1;
+		    String name2 = props.getProperty("name2");
+		    LIST_OF_NAMES[2] = name2;
+		    String name3 = props.getProperty("name3");
+		    LIST_OF_NAMES[3] = name3;
+		    
+		    System.out.println("The following names were read: " + name0 + " " + name1 + " " + name2 + " " + name3);
 		    
 		    String blackList = props.getProperty("blackList");
 		    BLACK_LIST = blackList.split(",");
@@ -194,7 +210,7 @@ public class SimpleBot extends TelegramLongPollingBot
 					LIST_OF_PUBLICS[0] = newPublicId_1;
 					LIST_OF_STARTS[0] = 0;
 					sendMsg(message, "New 1st public is set to " + newPublicId_1);
-					props.setProperty("id1", newPublicId_1);
+					props.setProperty("id0", newPublicId_1);
 					saveProperties();
 				}
 				if (message.getText().startsWith(SET_NEW_2)) 
@@ -203,7 +219,7 @@ public class SimpleBot extends TelegramLongPollingBot
 					LIST_OF_PUBLICS[1] = newPublicId_2;
 					LIST_OF_STARTS[1] = 0;
 					sendMsg(message, "New 2nd public is set to " + newPublicId_2);
-					props.setProperty("id2", newPublicId_2);
+					props.setProperty("id1", newPublicId_2);
 					saveProperties();
 				}
 				if (message.getText().startsWith(SET_NEW_3)) 
@@ -212,7 +228,7 @@ public class SimpleBot extends TelegramLongPollingBot
 					LIST_OF_PUBLICS[2] = newPublicId_3;
 					LIST_OF_STARTS[2] = 0;
 					sendMsg(message, "New 3rd public is set to " + newPublicId_3);
-					props.setProperty("id3", newPublicId_3);
+					props.setProperty("id2", newPublicId_3);
 					saveProperties();
 				}
 				
@@ -320,13 +336,13 @@ public class SimpleBot extends TelegramLongPollingBot
 													else
 													{
 														sendMessageToChannel(PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
+														
 														if (isWhiteListed(comment))
 														{
 															sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
 														}
 													}
 												}
-												
 											}
 										}
 									}
@@ -334,7 +350,35 @@ public class SimpleBot extends TelegramLongPollingBot
 									{
 										LIST_OF_STARTS[publicId] = 0;
 									}
-								}								
+								}	
+								// Check new subscriptions
+								try 
+								{
+									getProperties();
+									XmlItem item = XmlReader.getRssFeedLastItemId(LIST_OF_NAMES[publicId]);
+									System.out.println("item.getId(): " + item.getId());
+									System.out.println("LIST_OF_PUBLICS[i]: " + LIST_OF_PUBLICS[publicId] + "\n");
+									if (!item.getId().equals(LIST_OF_PUBLICS[publicId]))
+									{
+										props.setProperty(new String("id" + publicId), item.getId());
+										saveProperties();
+										if (isDebug)
+										{
+											sendMsg(message, App.getActiveSubscriptions(item));
+										}
+										else
+										{
+											sendMessageToChannel(SUBBSCRIPTIONS_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+											sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+										}
+										getProperties();
+									}
+								} 
+								catch (IOException e) 
+								{
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 							sendMsg(message, "You has been unsubscribed");
 						}
@@ -345,10 +389,39 @@ public class SimpleBot extends TelegramLongPollingBot
 				{
 					isRunning = false;
 				}
-				/* else if (message.getText().startsWith("@") && !message.getText().trim().contains(" "))
+				else if (message.getText().equals("/printActive"))
 				{
-					sendMessageToChannel(message, message.getText());
-				}*/
+					getProperties();
+					for (int i = 0; i < LIST_OF_NAMES.length; i++)
+					{
+						try 
+						{
+							XmlItem item = XmlReader.getRssFeedLastItemId(LIST_OF_NAMES[i]);
+							System.out.println("item.getId(): " + item.getId());
+							System.out.println("LIST_OF_PUBLICS[i]: " + LIST_OF_PUBLICS[i] + "\n");
+							if (!item.getId().equals(LIST_OF_PUBLICS[i]))
+							{
+								props.setProperty(new String("id" + i), item.getId());
+								saveProperties();
+								if (isDebug)
+								{
+									sendMsg(message, App.getActiveSubscriptions(item));
+								}
+								else
+								{
+									sendMessageToChannel(SUBBSCRIPTIONS_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+									//sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+								}
+								getProperties();
+							}
+						} 
+						catch (IOException e) 
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
 				else
 				{
 					System.out.println(message.getFrom().getUserName() + " " + message.getFrom().getId());
@@ -418,5 +491,4 @@ public class SimpleBot extends TelegramLongPollingBot
 			e.printStackTrace();
 		}
 	}
- 
 }

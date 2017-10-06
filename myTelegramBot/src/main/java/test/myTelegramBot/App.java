@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 
 import test.myTelegramBot.json.Comment;
 import test.myTelegramBot.json.SportsMessages;
+import test.myTelegramBot.xml.XmlItem;
 
 public class App 
 {
@@ -144,6 +145,21 @@ public class App
 		message = "*" + topicCaster + ":*\n" 
 				+ rating + " " + time + "\n"	  
 				+ text + "\n" + answer + "\n";
+		
+		return message;
+	}
+	
+	public static String getActiveSubscriptions(XmlItem item) 
+	{
+		String message = "";
+
+		String channelName = new String(item.getChannelName() + "\n");
+		String link = new String('[' + "link" + ']' + '(' + item.getLink() + ')' + "\n");
+		String time = new String(item.getPubDate() + "\n");
+		String title = new String("*" + item.getTitle() + "*\n");
+		String description = new String("``` >>> " + item.getDescription() + "```" + "\n"); 
+		
+		message = channelName + title + description + time + link;
 		
 		return message;
 	}
