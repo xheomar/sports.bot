@@ -477,7 +477,7 @@ public class SimpleBot extends TelegramLongPollingBot
         sendMessage.enableMarkdown(true);
         sendMessage.setChatId(channelAddress);
         sendMessage.setText(text);
-        if (channelAddress.equals(THE_BEST_PUBLIC_CHANNEL) || channelAddress.equals(SUBBSCRIPTIONS_PUBLIC_CHANNEL))
+        if (channelAddress.equals(THE_BEST_PUBLIC_CHANNEL) || channelAddress.equals(PUBLIC_CHANNEL))
         {
         	sendMessage.disableWebPagePreview();
         }

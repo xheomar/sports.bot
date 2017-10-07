@@ -107,7 +107,7 @@ public class App
 		text = text.replaceAll("<a(.*?)>", "").replaceAll("<\\/a>", "");
 		String topicCaster = new String(comment.getUser().getName().replaceAll("_", ""));
 		String hashTagTopicCaster = new String("#" + comment.getUser().getName().replaceAll(" ", "").replaceAll("_", "").replaceAll("-", ""));
-		String hashTagTopic = new String("#" + comment.getMessageInfo().getName().replaceAll(" ", "") + 
+		String hashTagTopic = new String("#" + comment.getMessageInfo().getName().replaceAll(" ", "").replaceAll("-", "") + 
 				" " + '[' + "link" + ']' + '(' + comment.getMessageInfo().getLink() + ')');
 		String time = new String(comment.getCTime().getTime() + " " + comment.getCTime().getDate());
 		if (comment.getAnswerTo() != null)
