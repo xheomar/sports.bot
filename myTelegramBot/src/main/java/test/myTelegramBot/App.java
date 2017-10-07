@@ -106,14 +106,14 @@ public class App
 		// delete all hrefs
 		text = text.replaceAll("<a(.*?)>", "").replaceAll("<\\/a>", "");
 		String topicCaster = new String(comment.getUser().getName().replaceAll("_", ""));
-		String hashTagTopicCaster = new String("#" + comment.getUser().getName().replaceAll(" ", "").replaceAll("_", ""));
+		String hashTagTopicCaster = new String("#" + comment.getUser().getName().replaceAll(" ", "").replaceAll("_", "").replaceAll("-", ""));
 		String hashTagTopic = new String("#" + comment.getMessageInfo().getName().replaceAll(" ", "") + 
 				" " + '[' + "link" + ']' + '(' + comment.getMessageInfo().getLink() + ')');
 		String time = new String(comment.getCTime().getTime() + " " + comment.getCTime().getDate());
 		if (comment.getAnswerTo() != null)
 		{
 			String answerText = comment.getAnswerTo().getText().replaceAll("<br />", "").replaceAll("&quot;", "\""); //.replaceAll("_", "").replaceAll("`", "").replaceAll("[", "").replaceAll("]", "");
-			String answerTopicCaster = new String(comment.getAnswerTo().getUser().getName().replaceAll(" ", "").replaceAll("_", ""));
+			String answerTopicCaster = new String(comment.getAnswerTo().getUser().getName().replaceAll(" ", "").replaceAll("_", "").replaceAll("-", ""));
 			hashTagAnswerTopicCaster = new String("#" + answerTopicCaster);
 			answer = new String("``` >>> " + answerTopicCaster + ": " + answerText + "```" + "\n");
 		}
