@@ -214,6 +214,9 @@ public class Bet
 			    LEAGUES_URL = props.getProperty("leagues").split(" ");
 			    LEAGUE_NAMES = props.getProperty("league_names").split(",");
 			    
+			    
+			    LEAGUES_ARRAY.clear();
+			    
 			    for (int i=0; i<LEAGUES_URL.length; i++)
 			    {
 			    	LEAGUES_ARRAY.put(LEAGUE_NAMES[i], LEAGUES_URL[i]);
