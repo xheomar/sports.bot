@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Properties;
 
 import jersey.repackaged.com.google.common.collect.Lists;
+import test.myTelegramBot.bet.Bet;
 import test.myTelegramBot.json.Comment;
 import test.myTelegramBot.json.SportsMessages;
 import test.myTelegramBot.xml.XmlItem;
@@ -432,6 +433,23 @@ public class SimpleBot extends TelegramLongPollingBot
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+					}
+				}
+				else if (message.getText().equals("/printBets"))
+				{
+					try 
+					{
+						sendMsg(message, Bet.getBets());
+					} 
+					catch (UnsupportedOperationException e) 
+					{
+						sendMsg(message, "Something goes wrong");
+						e.printStackTrace();
+					} 
+					catch (IOException e) 
+					{
+						sendMsg(message, "Something goes wrong");
+						e.printStackTrace();
 					}
 				}
 				else
