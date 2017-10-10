@@ -29,9 +29,6 @@ import org.jsoup.select.Elements;
 
 public class Bet 
 {
-	private static final String MaraphoneBetUrlTemplate = 
-			"https://www.marathonbet.by/su/betting/Football/England/Northern+Premier+League/Premier+Division/";
-	
 	private static final String MaraphoneBetMarketsTemplate = 
 			"https://www.marathonbet.by/su/markets.htm";
 	
@@ -47,6 +44,8 @@ public class Bet
 	{
 		getProperties();
 		
+		String result = "";
+		
 		for (Map.Entry<String, String> leagueEntry : LEAGUES_ARRAY.entrySet())
 		{
 			// System.out.println(leagueEntry.getKey() + " " + leagueEntry.getValue());
@@ -61,12 +60,25 @@ public class Bet
 						count++;
 					}
 				}
-				System.out.print(leagueEntry.getKey() + ": " + count + "/");
-				System.out.println(ldsGamesArray.size() + " already with AnyOtherScore");
+				System.out.print(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size() + ": {");
+				result += new String(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size() + ": {");
+				
+				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
+				{
+					if (!games.getValue().equals("null"))
+					{
+						System.out.print(" " + games.getValue() + " ");
+						result += new String(" " + games.getValue() + " ");
+					}
+				}
+				
+				System.out.println("}");
+				result += new String("}");
 			}
 			else
 			{
 				System.out.println(leagueEntry.getKey() + ": is empty yet");
+				result += new String(leagueEntry.getKey() + ": is empty yet" + "\n");
 			}
 		}
 	}
@@ -91,10 +103,26 @@ public class Bet
 						count++;
 					}
 				}
-				System.out.print(leagueEntry.getKey() + ": " + count + "/");
-				result += new String(leagueEntry.getKey() + ": " + count + "/");
-				System.out.println(ldsGamesArray.size() + " already with AnyOtherScore");
-				result += new String(ldsGamesArray.size() + " already with AnyOtherScore" + "\n");
+				System.out.print(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size());
+				result += new String(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size());
+				
+				if (count != 0)
+				{
+					System.out.print(": {");
+					result += new String(": {");
+					
+					for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
+					{
+						if (!games.getValue().equals("null"))
+						{
+							System.out.print(" " + games.getValue() + " ");
+							result += new String(" " + games.getValue() + " ");
+						}
+					}
+					
+					System.out.println("}");
+					result += new String("}");
+				}
 			}
 			else
 			{
@@ -174,13 +202,16 @@ public class Bet
 	    	else 
 	    	{
 	    		String responseString = new BasicResponseHandler().handleResponse(response);
+	    		responseString = responseString.replaceAll("\\\\n","").replaceAll("\\\\","");
 	    		//System.out.println(responseString);
-	    		
-	    		Pattern r = Pattern.compile("AnyOther");
+	    		Pattern r = Pattern.compile("AnyOther\">[0-9]+(.[0-9])?");
+	    		// Pattern r = Pattern.compile("AnyOther");
 				Matcher m = r.matcher(responseString.toString());
 			    if (m.find( )) 
 			    {	
-			    	ldsGamesArray.put(id, m.group(0));			    	
+			    	String bet = m.group(0).split(">")[1];
+			    	//System.out.println(bet);
+			    	ldsGamesArray.put(id, bet);			    	
 			    }
 			    else
 			    {
