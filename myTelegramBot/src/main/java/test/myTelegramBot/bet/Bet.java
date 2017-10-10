@@ -123,6 +123,9 @@ public class Bet
 					System.out.println("}");
 					result += new String("}");
 				}
+				
+				System.out.println("\n");
+				result += new String("\n");
 			}
 			else
 			{
