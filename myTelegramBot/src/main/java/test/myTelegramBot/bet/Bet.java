@@ -56,7 +56,7 @@ public class Bet
 	{
 		getProperties();
 		
-		String resultOverall = "";
+		String resultOverall = "", notYet = "", zeroGames = "";
 		
 		LEAGUES_ARRAY = sortByValues(LEAGUES_ARRAY, -1);
 		
@@ -77,11 +77,11 @@ public class Bet
 					{
 						count++;
 					}
-				}
-				result += new String(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size());
+				}				
 				
 				if (count != 0)
 				{
+					result += new String("*" + leagueEntry.getKey() + "*" + ": " + count + "/" + ldsGamesArray.size());
 					result += new String(": {");
 					
 					for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
@@ -98,20 +98,39 @@ public class Bet
 					}
 					
 					result += new String("}");
+					result += new String("\n\n");
 				}
-				
-				result += new String("\n\n");
+				else
+				{
+					zeroGames += new String(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size());
+					zeroGames += new String(": {");
+					
+					for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
+					{
+						if (games.getValue().startsWith("null"))
+						{
+							String gameDate = new String(" (" + games.getValue().split(",")[1] + ") ");
+							//String leagueLink = new String(" [" + gameDate + "]" + " (" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") ");
+							
+							// zeroGames += new String(" " + gameBet + leagueLink);
+							zeroGames += new String(gameDate);
+						}
+					}
+					
+					zeroGames += new String("}");
+					zeroGames += new String("\n\n");
+				}
 			}
 			else
 			{
-				//result += new String(leagueEntry.getKey() + ": is empty yet" + "\n");
+				notYet += new String(leagueEntry.getKey() + ": is empty yet" + "\n");
 			}
 			//break;
 			System.out.print(result);
 			resultOverall += result;
 		}
 		
-		System.out.print(resultOverall);
+		System.out.print(resultOverall + zeroGames + notYet);
 		
 		return resultOverall;
 	}
@@ -236,7 +255,7 @@ public class Bet
 			    }
 			    else
 			    {
-			    	ldsGamesArray.put(id, new String("null" + "," + gameDate));	
+			    	ldsGamesArray.put(id, new String("null" + "," + changeDate(gameDate)));	
 			    }	    		
 	    	}
 	    	
