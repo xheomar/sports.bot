@@ -37,12 +37,12 @@ public class SimpleBot extends TelegramLongPollingBot
 	private static final String TOP_2 = "/top2";
 	private static final String TOP_3 = "/top3";
 	private static final String TOP_4 = "/top4";
-	private volatile String [] LIST_OF_PUBLICS = {"", "", "", ""};
-	private volatile String [] LIST_OF_NAMES = {"", "", "", ""};
+	private volatile String [] LIST_OF_PUBLICS = {"", "", "", "", ""};
+	private volatile String [] LIST_OF_NAMES = {"", "", "", "", ""};
 	private volatile String [] BLACK_LIST = {""};
 	private volatile String [] WHITE_LIST = {""};
-	private volatile long [] LIST_OF_LAST_MESSAGES = {0, 0, 0, 0};
-	private volatile int [] LIST_OF_STARTS = {0, 0, 0, 0};
+	private volatile long [] LIST_OF_LAST_MESSAGES = {0, 0, 0, 0, 0};
+	private volatile int [] LIST_OF_STARTS = {0, 0, 0, 0, 0};
 	private static final int ADMIN_USERID = 17872630;
 	private static final String PUBLIC_CHANNEL = "@systemfootball";
 	private static final String THE_BEST_PUBLIC_CHANNEL = "@sportsruthebest";
@@ -97,6 +97,8 @@ public class SimpleBot extends TelegramLongPollingBot
 				System.out.println("Bot registration... ");
 				telegramBotsApi.registerBot(myBot);
 				myBot.getProperties();
+				
+				System.out.println("\n\nBot is running! ");
 			} 
 			catch (TelegramApiException e) 
 			{
@@ -123,8 +125,10 @@ public class SimpleBot extends TelegramLongPollingBot
 		    LIST_OF_PUBLICS[2] = id2;
 		    String id3 = props.getProperty("id3");
 		    LIST_OF_PUBLICS[3] = id3;
+		    String id4 = props.getProperty("id4");
+		    LIST_OF_PUBLICS[4] = id4;
 		    
-		    System.out.println("The following IDs were read: " + id0 + " " + id1 + " " + id2 + " " + id3);
+		    System.out.println("The following IDs were read: " + id0 + " " + id1 + " " + id2 + " " + id3 + " " + id4);
 		    
 		    String name0 = props.getProperty("name0");
 		    LIST_OF_NAMES[0] = name0;
@@ -134,8 +138,10 @@ public class SimpleBot extends TelegramLongPollingBot
 		    LIST_OF_NAMES[2] = name2;
 		    String name3 = props.getProperty("name3");
 		    LIST_OF_NAMES[3] = name3;
+		    String name4 = props.getProperty("name4");
+		    LIST_OF_NAMES[4] = name4;
 		    
-		    System.out.println("The following names were read: " + name0 + " " + name1 + " " + name2 + " " + name3);
+		    System.out.println("The following names were read: " + name0 + " " + name1 + " " + name2 + " " + name3 + " " + name4);
 		    
 		    String blackList = props.getProperty("blackList");
 		    BLACK_LIST = blackList.split(",");
@@ -146,6 +152,8 @@ public class SimpleBot extends TelegramLongPollingBot
 		    	System.out.print(blacked + " ");
 		    }
 		    
+		    System.out.print("\n\n");
+		    
 		    String whiteList = props.getProperty("whiteList");
 		    WHITE_LIST = whiteList.split(",");
 		    
@@ -154,6 +162,8 @@ public class SimpleBot extends TelegramLongPollingBot
 		    {
 		    	System.out.print(whites + " ");
 		    }
+		    
+		    System.out.print("\n\n");
 		    
 		    reader.close();
 		} 
@@ -283,7 +293,7 @@ public class SimpleBot extends TelegramLongPollingBot
 									e1.printStackTrace();
 								}
 								
-								if (publicId == 4)
+								if (publicId == 5)
 								{
 									publicId = 0;
 								}

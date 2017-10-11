@@ -132,7 +132,7 @@ public class Bet
 		
 		System.out.print(resultOverall + zeroGames + notYet);
 		
-		return resultOverall;
+		return new String (resultOverall + zeroGames + notYet);
 	}
 	
 	public static Map<String, String> getGames(String urlString) throws UnsupportedOperationException, IOException 
