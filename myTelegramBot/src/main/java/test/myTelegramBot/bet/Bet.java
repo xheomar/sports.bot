@@ -58,7 +58,14 @@ public class Bet
 		
 		String resultOverall = "", notYet = "", zeroGames = "";
 		
-		LEAGUES_ARRAY = sortByValues(LEAGUES_ARRAY, -1);
+		if (LEAGUES_ARRAY != null)
+		{
+			LEAGUES_ARRAY = sortByValues(LEAGUES_ARRAY, -1);	
+		}	
+		else 
+		{
+			System.out.println("LEAGUES_ARRAY == null"); 
+		}
 		
 		for (Map.Entry<String, String> leagueEntry : LEAGUES_ARRAY.entrySet())
 		{
@@ -280,7 +287,7 @@ public class Bet
 
 	private static void getProperties() 
 	{
-		//System.out.println("Reading configuration... ");
+		System.out.println("Reading configuration... ");
 		try 
 		{
 		    FileReader reader = new FileReader(configFile);
@@ -320,12 +327,16 @@ public class Bet
 	
 	public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map, int ascending)
 	{
-	    Comparator<K> valueComparator =  new Comparator<K>() {         
+	    Comparator<K> valueComparator =  new Comparator<K>() 
+	    {         
 	       private int ascending;
-	       public int compare(K k1, K k2) {
+	       public int compare(K k1, K k2) 
+	       {
 	           int compare = map.get(k2).compareTo(map.get(k1));
-	           if (compare == 0) return 1;
-	           else return ascending*compare;
+	           if (compare == 0) 
+	        	   return 1;
+	           else 
+	        	   return ascending*compare;
 	       }
 	       public Comparator<K> setParam(int ascending)
 	       {
