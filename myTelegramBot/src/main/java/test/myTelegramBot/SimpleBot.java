@@ -447,23 +447,32 @@ public class SimpleBot extends TelegramLongPollingBot
 				}
 				else if (message.getText().equals("/printBets"))
 				{
-					try 
+					new Thread() 
 					{
-						sendMsg(message, Bet.getBets());
-					} 
-					catch (UnsupportedOperationException e) 
-					{
-						sendMsg(message, "Something goes wrong");
-						e.printStackTrace();
-					} 
-					catch (IOException e) 
-					{
-						sendMsg(message, "Something goes wrong");
-						e.printStackTrace();
-					}
+						@Override
+						public void run()
+						{
+							try 
+							{
+								sendMsg(message, "Calculating AnyOtherScore bets is in progress...");
+								sendMsg(message, Bet.getBets());
+							} 
+							catch (UnsupportedOperationException e) 
+							{
+								sendMsg(message, "Something goes wrong");
+								e.printStackTrace();
+							} 
+							catch (IOException e) 
+							{
+								sendMsg(message, "Something goes wrong");
+								e.printStackTrace();
+							}
+						}
+					}.start();
 				}
 				else
 				{
+					sendMsg(message, "/start /startDebug /printBets /printActive");
 					System.out.println(message.getFrom().getUserName() + " " + message.getFrom().getId());
 				}
 			}	
