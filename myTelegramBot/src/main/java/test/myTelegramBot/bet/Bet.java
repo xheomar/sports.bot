@@ -7,10 +7,12 @@ import java.io.IOException;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,10 +29,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.google.common.collect.MultimapBuilder.SortedSetMultimapBuilder;
+
 public class Bet 
 {
 	private static final String MaraphoneBetMarketsTemplate = 
 			"https://www.marathonbet.by/su/markets.htm";
+	
+	private static final String MaraphoneBetUrlTemplate = 
+			"https://www.marathonbet.by/su/betting/Football/";
 	
 	static File configFile = new File("config.properties");
 	static Properties props = new Properties();
@@ -42,99 +49,71 @@ public class Bet
 
 	public static void main(String[] args) throws IOException
 	{
-		getProperties();
-		
-		String result = "";
-		
-		for (Map.Entry<String, String> leagueEntry : LEAGUES_ARRAY.entrySet())
-		{
-			// System.out.println(leagueEntry.getKey() + " " + leagueEntry.getValue());
-			Map<String, String> ldsGamesArray = getGames(leagueEntry.getValue());
-			if (ldsGamesArray != null)
-			{
-				int count = 0;
-				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
-				{
-					if (!games.getValue().equals("null"))
-					{
-						count++;
-					}
-				}
-				System.out.print(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size() + ": {");
-				result += new String(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size() + ": {");
-				
-				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
-				{
-					if (!games.getValue().equals("null"))
-					{
-						System.out.print(" " + games.getValue() + " ");
-						result += new String(" " + games.getValue() + " ");
-					}
-				}
-				
-				System.out.println("}");
-				result += new String("}");
-			}
-			else
-			{
-				System.out.println(leagueEntry.getKey() + ": is empty yet");
-				result += new String(leagueEntry.getKey() + ": is empty yet" + "\n");
-			}
-		}
+		getBets();
 	}
 	
 	public static String getBets() throws UnsupportedOperationException, IOException
 	{
 		getProperties();
 		
-		String result = "";
+		String resultOverall = "";
+		
+		LEAGUES_ARRAY = sortByValues(LEAGUES_ARRAY, -1);
 		
 		for (Map.Entry<String, String> leagueEntry : LEAGUES_ARRAY.entrySet())
 		{
+			String result = "";
+			
 			// System.out.println(leagueEntry.getKey() + " " + leagueEntry.getValue());
 			Map<String, String> ldsGamesArray = getGames(leagueEntry.getValue());
 			if (ldsGamesArray != null)
 			{
+				ldsGamesArray = sortByValues(ldsGamesArray, -1);
+				
 				int count = 0;
 				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
 				{
-					if (!games.getValue().equals("null"))
+					if (!games.getValue().startsWith("null"))
 					{
 						count++;
 					}
 				}
-				System.out.print(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size());
 				result += new String(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size());
 				
 				if (count != 0)
 				{
-					System.out.print(": {");
 					result += new String(": {");
 					
 					for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
 					{
-						if (!games.getValue().equals("null"))
+						if (!games.getValue().startsWith("null"))
 						{
-							System.out.print(" " + games.getValue() + " ");
-							result += new String(" " + games.getValue() + " ");
+							String gameBet = new String("*" + games.getValue().split(",")[1] + "*");
+							String gameDate = new String(" (" + games.getValue().split(",")[0] + ") ");
+							//String leagueLink = new String(" [" + gameDate + "]" + " (" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") ");
+							
+							// result += new String(" " + gameBet + leagueLink);
+							result += new String(" " + gameBet + gameDate);
 						}
 					}
 					
-					System.out.println("}");
 					result += new String("}");
 				}
 				
-				System.out.println("\n");
-				result += new String("\n");
+				result += new String("\n\n");
 			}
 			else
 			{
-				System.out.println(leagueEntry.getKey() + ": is empty yet");
-				result += new String(leagueEntry.getKey() + ": is empty yet" + "\n");
+				//result += new String(leagueEntry.getKey() + ": is empty yet" + "\n");
 			}
+			//break;
+			System.out.print(result);
+			resultOverall += result;
 		}
 		
-		return result;
+		System.out.print(resultOverall);
+		
+		return resultOverall;
 	}
 	
 	public static Map<String, String> getGames(String urlString) throws UnsupportedOperationException, IOException 
@@ -150,23 +129,59 @@ public class Bet
 		try 
 		{
 			Document doc;
-			doc = Jsoup.connect(urlString).timeout(50000).get();	
-			Elements games = doc.getElementsByClass("member-area-button");
+			doc = Jsoup.connect(MaraphoneBetUrlTemplate + urlString).timeout(50000).get();	
+			// Elements games = doc.getElementsByClass("member-area-button");
+			Elements games = doc.select("td[class = member-area-button]");
+			Elements dates = doc.getElementsByClass("date ");
 			
-			for (Element game : games) 
+			/*for (Element game : games) 
 			{
+				// System.out.println(game);
 				Pattern r = Pattern.compile("\"\\d+\"");
 				Matcher m = r.matcher(game.toString());
 			    if (m.find( )) 
 			    {				
 			    	idList.add(m.group(0).replaceAll("\"",""));		
+			    	System.out.println(m.group(0).replaceAll("\"",""));
 			    	count++;
 			    	if (count > 30)
 			    	{
 			    		return null;
 			    	}
 			    }
-				
+			}*/
+			
+			//System.out.println(games.size());
+			//System.out.println(dates.size());
+			
+			/*for (Element date : dates)
+			{
+				System.out.println(date.html());
+			}
+			
+			for (Element game : games)
+			{
+				System.out.println(game.html());
+			}*/
+			
+			for (int i = 1, j = 0; i < games.size(); i+=2, j++)
+			{
+				String gameId = "";
+				String gameDate = "";
+				Pattern r = Pattern.compile("\"\\d+\"");
+				Matcher m = r.matcher(games.get(i).toString());
+			    if (m.find( )) 
+			    {				
+			    	gameId = new String(m.group(0).replaceAll("\"",""));
+			    	gameDate = new String(dates.get(j).html());
+			    	idList.add(gameId + "," + gameDate);		
+			    	//System.out.println(gameId + "," + gameDate);
+			    	count++;
+			    	if (count > 30)
+			    	{
+			    		return null;
+			    	}
+			    }
 			}
 		}
 		catch (SocketTimeoutException exp)
@@ -183,11 +198,14 @@ public class Bet
 		{
 			// System.out.println(id);
 			
+			String gameId = new String(id.split(",")[0]);
+			String gameDate = new String(id.split(",")[1]);
+			
 			CloseableHttpClient client = HttpClients.createDefault();
 		    HttpPost httpPost = new HttpPost(MaraphoneBetMarketsTemplate);
 		 
 		    List<NameValuePair> params = new ArrayList<NameValuePair>();
-		    params.add(new BasicNameValuePair("treeId", id));
+		    params.add(new BasicNameValuePair("treeId", gameId));
 		    params.add(new BasicNameValuePair("siteStyle", "SIMPLE"));
 		    httpPost.setEntity(new UrlEncodedFormEntity(params));
 		 
@@ -207,18 +225,18 @@ public class Bet
 	    		String responseString = new BasicResponseHandler().handleResponse(response);
 	    		responseString = responseString.replaceAll("\\\\n","").replaceAll("\\\\","");
 	    		//System.out.println(responseString);
-	    		Pattern r = Pattern.compile("AnyOther\">[0-9]+(.[0-9])?");
+	    		Pattern r = Pattern.compile("AnyOther\">[0-9]+(.[0-9]+)?");
 	    		// Pattern r = Pattern.compile("AnyOther");
 				Matcher m = r.matcher(responseString.toString());
 			    if (m.find( )) 
 			    {	
 			    	String bet = m.group(0).split(">")[1];
 			    	//System.out.println(bet);
-			    	ldsGamesArray.put(id, bet);			    	
+			    	ldsGamesArray.put(id, new String(changeDate(gameDate) + "," + bet));			    	
 			    }
 			    else
 			    {
-			    	ldsGamesArray.put(id, "null");	
+			    	ldsGamesArray.put(id, new String("null" + "," + gameDate));	
 			    }	    		
 	    	}
 	    	
@@ -234,6 +252,13 @@ public class Bet
 		
 	}
 	
+	private static String changeDate(String gameDate) 
+	{
+		String newDate = gameDate.
+				replaceAll(" окт", ".10");
+		return newDate;
+	}
+
 	private static void getProperties() 
 	{
 		//System.out.println("Reading configuration... ");
@@ -248,12 +273,11 @@ public class Bet
 			    LEAGUES_URL = props.getProperty("leagues").split(" ");
 			    LEAGUE_NAMES = props.getProperty("league_names").split(",");
 			    
-			    
 			    LEAGUES_ARRAY.clear();
 			    
 			    for (int i=0; i<LEAGUES_URL.length; i++)
 			    {
-			    	LEAGUES_ARRAY.put(LEAGUE_NAMES[i], LEAGUES_URL[i]);
+			    	LEAGUES_ARRAY.put(LEAGUE_NAMES[i].trim(), LEAGUES_URL[i]);
 			    }
 			    
 			    
@@ -273,6 +297,27 @@ public class Bet
 		{
 			System.out.println("I/O error");
 		}
+	}
+	
+	public static <K, V extends Comparable<V>> Map<K, V> sortByValues(final Map<K, V> map, int ascending)
+	{
+	    Comparator<K> valueComparator =  new Comparator<K>() {         
+	       private int ascending;
+	       public int compare(K k1, K k2) {
+	           int compare = map.get(k2).compareTo(map.get(k1));
+	           if (compare == 0) return 1;
+	           else return ascending*compare;
+	       }
+	       public Comparator<K> setParam(int ascending)
+	       {
+	           this.ascending = ascending;
+	           return this;
+	       }
+	   }.setParam(ascending);
+	
+	   Map<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
+	   sortedByValues.putAll(map);
+	   return sortedByValues;
 	}
 	
 }
