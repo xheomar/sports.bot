@@ -472,7 +472,7 @@ public class SimpleBot extends TelegramLongPollingBot
 				}
 				else
 				{
-					sendMsg(message, "/start /startDebug /printBets /printActive");
+					sendMsg(message, "/start /startDebug /printBets /printActive /stop");
 					System.out.println(message.getFrom().getUserName() + " " + message.getFrom().getId());
 				}
 			}	

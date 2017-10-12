@@ -60,7 +60,8 @@ public class Bet
 		
 		if (LEAGUES_ARRAY != null)
 		{
-			LEAGUES_ARRAY = sortByValues(LEAGUES_ARRAY, -1);	
+			// LEAGUES_ARRAY = sortByValues(LEAGUES_ARRAY, -1);	
+			LEAGUES_ARRAY = MapUtil.sortByValue(LEAGUES_ARRAY);
 		}	
 		else 
 		{
@@ -75,7 +76,8 @@ public class Bet
 			Map<String, String> ldsGamesArray = getGames(leagueEntry.getValue());
 			if (ldsGamesArray != null)
 			{
-				ldsGamesArray = sortByValues(ldsGamesArray, -1);
+				// ldsGamesArray = sortByValues(ldsGamesArray, -1);
+				ldsGamesArray = MapUtil.sortByValue(ldsGamesArray);
 				
 				int count = 0;
 				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
@@ -135,6 +137,7 @@ public class Bet
 			//break;
 			System.out.print(result);
 			resultOverall += result;
+			//return resultOverall;
 		}
 		
 		System.out.print(resultOverall + zeroGames + notYet);
@@ -303,6 +306,7 @@ public class Bet
 			    
 			    for (int i=0; i<LEAGUES_URL.length; i++)
 			    {
+			    	System.out.println(LEAGUE_NAMES[i].trim() + "  " + LEAGUES_URL[i]);
 			    	LEAGUES_ARRAY.put(LEAGUE_NAMES[i].trim(), LEAGUES_URL[i]);
 			    }
 			    
@@ -332,6 +336,8 @@ public class Bet
 	       private int ascending;
 	       public int compare(K k1, K k2) 
 	       {
+	    	   System.out.println("map.get(k1) = " + map.get(k1));
+	    	   System.out.println("map.get(k2) = " + map.get(k2));
 	           int compare = map.get(k2).compareTo(map.get(k1));
 	           if (compare == 0) 
 	        	   return 1;
@@ -346,7 +352,20 @@ public class Bet
 	   }.setParam(ascending);
 	
 	   Map<K, V> sortedByValues = new TreeMap<K, V>(valueComparator);
-	   sortedByValues.putAll(map);
+	   try
+	   {
+		   sortedByValues.putAll(map);
+	   }
+	   catch (NullPointerException e)
+	   {
+		   e.printStackTrace();
+		   System.out.println(e.getMessage());
+		   
+		   System.out.println("valueComparator = " + valueComparator);
+		   System.out.println("sortedByValues = " + sortedByValues);
+		   System.out.println("map = " + map);
+	   }
+	   
 	   return sortedByValues;
 	}
 	
