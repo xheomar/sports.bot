@@ -7,8 +7,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Queue;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 import test.myTelegramBot.bet.Bet;
@@ -455,7 +460,34 @@ public class SimpleBot extends TelegramLongPollingBot
 							try 
 							{
 								sendMsg(message, "Calculating AnyOtherScore bets is in progress...");
-								sendMsg(message, Bet.getBets());
+								LinkedList<String> resultQueue = Bet.getBets();
+								if (resultQueue == null || resultQueue.size() == 0)
+								{
+									sendMsg(message, "Something goes wrong");
+								}
+								else
+								{
+									DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+									Date date = new Date();
+									//System.out.println(dateFormat.format(date)); //2016/11/16 12:08:43
+									String today = new String(dateFormat.format(date) + "\n\n");
+									
+									int pages = resultQueue.size() / 10;
+									if (resultQueue.size() % 10 != 0) pages++;
+									
+									String portion10 = "";
+									for (int i = 0, j = 0; i < resultQueue.size(); i++)
+									{
+										portion10 += resultQueue.get(i);
+										System.out.println(i);
+										if ((i!=0 && i % 10 == 0) || i == resultQueue.size()-1)
+										{
+											sendMsg(message, today + "Part " + ++j + "/" 
+															+ pages + "\n\n" + portion10);
+											portion10 = "";
+										}
+									}
+								}
 							} 
 							catch (UnsupportedOperationException e) 
 							{
@@ -535,6 +567,7 @@ public class SimpleBot extends TelegramLongPollingBot
 		sendMessage.enableMarkdown(true);
 		sendMessage.setChatId(message.getChatId().toString());
 		sendMessage.setText(text);
+		sendMessage.disableWebPagePreview();
 		System.out.println("Sent the message: " + text);
 		try 
 		{

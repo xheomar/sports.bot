@@ -6,12 +6,17 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import java.net.SocketTimeoutException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +44,9 @@ public class Bet
 	private static final String MaraphoneBetUrlTemplate = 
 			"https://www.marathonbet.by/su/betting/Football/";
 	
+	private static final String BOLD = "*";
+	private static final String ITALIC = "_";
+	
 	static File configFile = new File("config.properties");
 	static Properties props = new Properties();
 	
@@ -52,9 +60,13 @@ public class Bet
 		getBets();
 	}
 	
-	public static String getBets() throws UnsupportedOperationException, IOException
+	public static LinkedList<String> getBets() throws UnsupportedOperationException, IOException
 	{
 		getProperties();
+		
+		
+		
+		LinkedList<String> resultQueue = new LinkedList<String>();
 		
 		String resultOverall = "", notYet = "", zeroGames = "";
 		
@@ -76,9 +88,7 @@ public class Bet
 			Map<String, String> ldsGamesArray = getGames(leagueEntry.getValue());
 			if (ldsGamesArray != null)
 			{
-				// ldsGamesArray = sortByValues(ldsGamesArray, -1);
 				ldsGamesArray = MapUtil.sortByValue(ldsGamesArray);
-				
 				int count = 0;
 				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
 				{
@@ -86,65 +96,91 @@ public class Bet
 					{
 						count++;
 					}
-				}				
+				}	
 				
-				if (count != 0)
+				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : " + count + "/" + ldsGamesArray.size());
+				result += new String(" : \n");
+				
+				String todayGames = "", notTodayGames = "";
+				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
 				{
-					result += new String("*" + leagueEntry.getKey() + "*" + ": " + count + "/" + ldsGamesArray.size());
-					result += new String(": {");
-					
-					for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
+					if (!games.getValue().startsWith("null"))
 					{
-						if (!games.getValue().startsWith("null"))
+						
+						String gameBet, gameDate;
+						
+						gameDate = " (" + games.getValue().split(",")[0] + ") ";
+						
+						// TODAY?
+						if (!games.getValue().split(",")[0].contains("."))
 						{
-							String gameBet = new String("*" + games.getValue().split(",")[1] + "*");
-							String gameDate = new String(" (" + games.getValue().split(",")[0] + ") ");
-							//String leagueLink = new String(" [" + gameDate + "]" + " (" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") ");
-							
-							// result += new String(" " + gameBet + leagueLink);
-							result += new String(" " + gameBet + gameDate);
+							gameBet = toBold(games.getValue().split(",")[1]);
+							todayGames += gameBet + gameDate;
+						}
+						// NOT TODAY
+						else
+						{
+							gameBet = toItalic(games.getValue().split(",")[1]);
+							notTodayGames += gameBet + gameDate;
+						}		
+					}
+				}
+
+				for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
+				{
+					if (games.getValue().startsWith("null"))
+					{
+						String gameBet, gameDate;
+						
+						gameDate = " (" + games.getValue().split(",")[1] + ") ";
+						
+						// TODAY?
+						if (!games.getValue().split(",")[1].contains("."))
+						{
+							gameBet = toBold("?");
+							todayGames += gameBet + gameDate;
+						}
+						// NOT TODAY
+						else
+						{
+							gameBet = toItalic("?");
+							notTodayGames += gameBet + gameDate;
 						}
 					}
-					
-					result += new String("}");
-					result += new String("\n\n");
 				}
-				else
+				
+				if (!todayGames.isEmpty())
 				{
-					zeroGames += new String(leagueEntry.getKey() + ": " + count + "/" + ldsGamesArray.size());
-					zeroGames += new String(": {");
-					
-					for (Map.Entry<String, String> games : ldsGamesArray.entrySet())
-					{
-						if (games.getValue().startsWith("null"))
-						{
-							String gameDate = new String(" (" + games.getValue().split(",")[1] + ") ");
-							//String leagueLink = new String(" [" + gameDate + "]" + " (" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") ");
-							
-							// zeroGames += new String(" " + gameBet + leagueLink);
-							zeroGames += new String(gameDate);
-						}
-					}
-					
-					zeroGames += new String("}");
-					zeroGames += new String("\n\n");
+					result += todayGames + "\n";
 				}
+				if (!notTodayGames.isEmpty())
+				{
+					result += notTodayGames + "\n";
+				}
+				result += new String("\n");
 			}
 			else
 			{
-				notYet += new String(leagueEntry.getKey() + ": is empty yet" + "\n");
+				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : is empty yet" + "\n");
 			}
-			//break;
 			System.out.print(result);
-			resultOverall += result;
-			//return resultOverall;
+			
+			resultQueue.add(result);
 		}
-		
-		System.out.print(resultOverall + zeroGames + notYet);
-		
-		return new String (resultOverall + zeroGames + notYet);
+
+		return resultQueue;
 	}
 	
+	private static String toBold(String string) 
+	{
+		return new String(BOLD + string + BOLD);
+	}
+	
+	private static String toItalic(String string) 
+	{
+		return new String(ITALIC + string + ITALIC);
+	}
+
 	public static Map<String, String> getGames(String urlString) throws UnsupportedOperationException, IOException 
 	{
 		Map<String, String> ldsGamesArray = new HashMap<String, String>();
@@ -306,11 +342,10 @@ public class Bet
 			    
 			    for (int i=0; i<LEAGUES_URL.length; i++)
 			    {
-			    	System.out.println(LEAGUE_NAMES[i].trim() + "  " + LEAGUES_URL[i]);
+			    	//System.out.println(LEAGUE_NAMES[i].trim() + "  " + LEAGUES_URL[i]);
 			    	LEAGUES_ARRAY.put(LEAGUE_NAMES[i].trim(), LEAGUES_URL[i]);
 			    }
-			    
-			    
+
 		    }
 		    catch (NullPointerException exp)
 		    {
