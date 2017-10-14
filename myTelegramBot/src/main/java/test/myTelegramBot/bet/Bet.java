@@ -76,13 +76,15 @@ public class Bet
 			System.out.println("LEAGUES_ARRAY == null"); 
 		}
 		
-		int eventId = 0;
 		for (Map.Entry<String, String> leagueEntry : LEAGUES_ARRAY.entrySet())
 		{
 			String result = "";
 			
-			// System.out.println(leagueEntry.getKey() + " " + leagueEntry.getValue());
-			Map<String, String> ldsGamesArray = getGames(leagueEntry.getValue(), EVENTS[eventId]);
+			System.out.println(leagueEntry.getKey() + " " + leagueEntry.getValue());
+			String url = leagueEntry.getValue().split("\\|")[0];
+			String event = leagueEntry.getValue().split("\\|")[1];
+			System.out.println(url + " " + event);
+			Map<String, String> ldsGamesArray = getGames(url, event);
 			if (ldsGamesArray != null)
 			{
 				ldsGamesArray = MapUtil.sortByValue(ldsGamesArray);
@@ -95,9 +97,8 @@ public class Bet
 					}
 				}	
 				
-				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : " + count + "/" + ldsGamesArray.size() 
-																					+ " *" + EVENTS[eventId] + "*");
-				eventId++;
+				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + url + ") : " + count + "/" + ldsGamesArray.size() 
+																					+ " *" + event + "*");
 				result += new String(" : \n");
 				
 				String todayGames = "", notTodayGames = "";
@@ -160,7 +161,7 @@ public class Bet
 			}
 			else
 			{
-				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : is empty yet" + "\n\n");
+				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + url + ") : is empty yet" + "\n\n");
 			}
 			System.out.print(result);
 			
@@ -314,7 +315,7 @@ public class Bet
 			    for (int i=0; i<LEAGUES_URL.length; i++)
 			    {
 			    	//System.out.println(LEAGUE_NAMES[i].trim() + "  " + LEAGUES_URL[i]);
-			    	LEAGUES_ARRAY.put(LEAGUE_NAMES[i].trim(), LEAGUES_URL[i]);
+			    	LEAGUES_ARRAY.put(LEAGUE_NAMES[i].trim(), LEAGUES_URL[i] + "|" + EVENTS[i]);
 			    }
 
 		    }
