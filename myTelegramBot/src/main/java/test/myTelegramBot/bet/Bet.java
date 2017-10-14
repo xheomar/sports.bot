@@ -52,6 +52,7 @@ public class Bet
 	
 	private volatile static String [] LEAGUES_URL  = {""};
 	private volatile static String [] LEAGUE_NAMES = {""};
+	private volatile static String [] EVENTS = {""};
 	
 	private static Map<String, String> LEAGUES_ARRAY = new HashMap<String, String>();
 
@@ -63,16 +64,11 @@ public class Bet
 	public static LinkedList<String> getBets() throws UnsupportedOperationException, IOException
 	{
 		getProperties();
-		
-		
-		
+
 		LinkedList<String> resultQueue = new LinkedList<String>();
-		
-		String resultOverall = "", notYet = "", zeroGames = "";
 		
 		if (LEAGUES_ARRAY != null)
 		{
-			// LEAGUES_ARRAY = sortByValues(LEAGUES_ARRAY, -1);	
 			LEAGUES_ARRAY = MapUtil.sortByValue(LEAGUES_ARRAY);
 		}	
 		else 
@@ -80,12 +76,13 @@ public class Bet
 			System.out.println("LEAGUES_ARRAY == null"); 
 		}
 		
+		int eventId = 0;
 		for (Map.Entry<String, String> leagueEntry : LEAGUES_ARRAY.entrySet())
 		{
 			String result = "";
 			
 			// System.out.println(leagueEntry.getKey() + " " + leagueEntry.getValue());
-			Map<String, String> ldsGamesArray = getGames(leagueEntry.getValue());
+			Map<String, String> ldsGamesArray = getGames(leagueEntry.getValue(), EVENTS[eventId]);
 			if (ldsGamesArray != null)
 			{
 				ldsGamesArray = MapUtil.sortByValue(ldsGamesArray);
@@ -98,7 +95,9 @@ public class Bet
 					}
 				}	
 				
-				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : " + count + "/" + ldsGamesArray.size());
+				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : " + count + "/" + ldsGamesArray.size() 
+																					+ " *" + EVENTS[eventId] + "*");
+				eventId++;
 				result += new String(" : \n");
 				
 				String todayGames = "", notTodayGames = "";
@@ -161,7 +160,7 @@ public class Bet
 			}
 			else
 			{
-				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : is empty yet" + "\n");
+				result += new String("[" + leagueEntry.getKey() + "](" + MaraphoneBetUrlTemplate + leagueEntry.getValue() + ") : is empty yet" + "\n\n");
 			}
 			System.out.print(result);
 			
@@ -181,7 +180,7 @@ public class Bet
 		return new String(ITALIC + string + ITALIC);
 	}
 
-	public static Map<String, String> getGames(String urlString) throws UnsupportedOperationException, IOException 
+	public static Map<String, String> getGames(String urlString, String event) throws UnsupportedOperationException, IOException 
 	{
 		Map<String, String> ldsGamesArray = new HashMap<String, String>();
 		
@@ -198,37 +197,7 @@ public class Bet
 			// Elements games = doc.getElementsByClass("member-area-button");
 			Elements games = doc.select("td[class = member-area-button]");
 			Elements dates = doc.getElementsByClass("date ");
-			
-			/*for (Element game : games) 
-			{
-				// System.out.println(game);
-				Pattern r = Pattern.compile("\"\\d+\"");
-				Matcher m = r.matcher(game.toString());
-			    if (m.find( )) 
-			    {				
-			    	idList.add(m.group(0).replaceAll("\"",""));		
-			    	System.out.println(m.group(0).replaceAll("\"",""));
-			    	count++;
-			    	if (count > 30)
-			    	{
-			    		return null;
-			    	}
-			    }
-			}*/
-			
-			//System.out.println(games.size());
-			//System.out.println(dates.size());
-			
-			/*for (Element date : dates)
-			{
-				System.out.println(date.html());
-			}
-			
-			for (Element game : games)
-			{
-				System.out.println(game.html());
-			}*/
-			
+
 			for (int i = 1, j = 0; i < games.size(); i+=2, j++)
 			{
 				String gameId = "";
@@ -290,7 +259,8 @@ public class Bet
 	    		String responseString = new BasicResponseHandler().handleResponse(response);
 	    		responseString = responseString.replaceAll("\\\\n","").replaceAll("\\\\","");
 	    		//System.out.println(responseString);
-	    		Pattern r = Pattern.compile("AnyOther\">[0-9]+(.[0-9]+)?");
+	    		//Pattern r = Pattern.compile("AnyOther\">[0-9]+(.[0-9]+)?");
+	    		Pattern r = Pattern.compile(event +"\">[0-9]+(.[0-9]+)?");
 	    		// Pattern r = Pattern.compile("AnyOther");
 				Matcher m = r.matcher(responseString.toString());
 			    if (m.find( )) 
@@ -337,6 +307,7 @@ public class Bet
 		    {
 			    LEAGUES_URL = props.getProperty("leagues").split(" ");
 			    LEAGUE_NAMES = props.getProperty("league_names").split(",");
+			    EVENTS = props.getProperty("events").split(" ");
 			    
 			    LEAGUES_ARRAY.clear();
 			    
