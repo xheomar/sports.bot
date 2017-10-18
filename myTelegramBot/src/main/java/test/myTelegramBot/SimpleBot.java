@@ -290,7 +290,7 @@ public class SimpleBot extends TelegramLongPollingBot
 							{
 								try 
 								{
-									Thread.sleep(5000);
+									Thread.sleep(10000);
 									publicId++;
 								} 
 								catch (InterruptedException e1) 
@@ -426,8 +426,9 @@ public class SimpleBot extends TelegramLongPollingBot
 						{
 							XmlItem item = XmlReader.getRssFeedLastItemId(LIST_OF_NAMES[i]);
 							System.out.println("item.getId(): " + item.getId());
+							System.out.println("item.getTitle(): " + item.getTitle());
 							System.out.println("LIST_OF_PUBLICS[i]: " + LIST_OF_PUBLICS[i] + "\n");
-							if (!item.getId().equals(LIST_OF_PUBLICS[i]))
+							if (!item.getId().equals(LIST_OF_PUBLICS[i]) && !item.getTitle().equalsIgnoreCase("ТУРНИР"))
 							{
 								props.setProperty(new String("id" + i), item.getId());
 								saveProperties();
@@ -437,7 +438,8 @@ public class SimpleBot extends TelegramLongPollingBot
 								}
 								else
 								{
-									sendMessageToChannel(SUBBSCRIPTIONS_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+									//sendMessageToChannel(SUBBSCRIPTIONS_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+									sendMsg(message, App.getActiveSubscriptions(item));
 									//sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
 								}
 								getProperties();
