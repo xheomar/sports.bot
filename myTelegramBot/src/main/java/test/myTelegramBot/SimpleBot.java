@@ -52,6 +52,8 @@ public class SimpleBot extends TelegramLongPollingBot
 	private static final String PUBLIC_CHANNEL = "@systemfootball";
 	private static final String THE_BEST_PUBLIC_CHANNEL = "@sportsruthebest";
 	private static final String SUBBSCRIPTIONS_PUBLIC_CHANNEL = "@sportsrusubscriptions";
+	private static final String JUNIOR_PUBLIC_CHANNEL = "@sportsrusubscriptions";
+	private static final String juniorNickName = "Chernyshevsky jr.";
 	private volatile boolean isRunning = true;
 	private volatile boolean isDebug = false; 
 	
@@ -329,6 +331,10 @@ public class SimpleBot extends TelegramLongPollingBot
 												{
 													sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
 												}
+												if (isChernysh(comment))
+												{
+													sendMessageToChannel(JUNIOR_PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
+												}
 											}	
 										}
 									}
@@ -368,6 +374,10 @@ public class SimpleBot extends TelegramLongPollingBot
 														{
 															sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
 														}
+														if (isChernysh(comment))
+														{
+															sendMessageToChannel(JUNIOR_PUBLIC_CHANNEL, message, app.getMessageFromComment(comment));
+														}
 													}
 												}
 											}
@@ -397,6 +407,10 @@ public class SimpleBot extends TelegramLongPollingBot
 										{
 											sendMessageToChannel(SUBBSCRIPTIONS_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
 											sendMessageToChannel(THE_BEST_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+											if (publicId == 2)
+											{
+												sendMessageToChannel(JUNIOR_PUBLIC_CHANNEL, message, App.getActiveSubscriptions(item));
+											}
 										}
 										LIST_OF_STARTS[publicId] = 0;
 										getProperties();
@@ -539,6 +553,16 @@ public class SimpleBot extends TelegramLongPollingBot
 				return true;
 			}
 	    }
+		return false;
+	}
+	
+
+	private boolean isChernysh(Comment comment) 
+	{
+		if (comment.getUser().getName().equalsIgnoreCase(juniorNickName))
+		{
+			return true;
+		}
 		return false;
 	}
 
