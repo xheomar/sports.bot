@@ -57,6 +57,8 @@ public class SimpleBot extends TelegramLongPollingBot
 	private volatile boolean isRunning = true;
 	private volatile boolean isDebug = false; 
 	
+	private int countOfBlogs = 2; // Only VNSL and Nepal
+	
 	static File configFile = new File("config.properties");
 	static Properties props = new Properties();
 	
@@ -124,33 +126,27 @@ public class SimpleBot extends TelegramLongPollingBot
 		    
 		    props.load(reader);
 		 
-		    String id0 = props.getProperty("id0");
-		    LIST_OF_PUBLICS[0] = id0;
-		    String id1 = props.getProperty("id1");
-		    LIST_OF_PUBLICS[1] = id1;
-		    String id2 = props.getProperty("id2");
-		    LIST_OF_PUBLICS[2] = id2;
-		    //String id3 = props.getProperty("id3");
-		    //LIST_OF_PUBLICS[3] = id3;
-		    //String id4 = props.getProperty("id4");
-		    //LIST_OF_PUBLICS[4] = id4;
+		    /**
+		     * Reading list of blogs. Default:
+		     * name0=stanemstavitstavki - VNSL
+		     * name1=sportandcash - Nepal
+		     * name2=zapiskipresledovatelya - Systemnyj Futbol
+		     * name3=volleyballbets - ???
+		     * name4=coinflip - ???
+		     */
+		    System.out.println("The following names were read: ");
+		    for (int j = 0; j < countOfBlogs; j++)
+		    {
+		    	LIST_OF_NAMES[j] = props.getProperty("name" + j);
+		    	LIST_OF_PUBLICS[j] = props.getProperty("id" + j);
+		    	
+		    	System.out.println(LIST_OF_NAMES[j] + " - " + LIST_OF_PUBLICS[j]);
+		    }
 		    
-		    System.out.println("The following IDs were read: " + id0 + " " + id1 + " " + id2);
-		    
-		    String name0 = props.getProperty("name0");
-		    LIST_OF_NAMES[0] = name0;
-		    String name1 = props.getProperty("name1");
-		    LIST_OF_NAMES[1] = name1;
-		    String name2 = props.getProperty("name2");
-		    LIST_OF_NAMES[2] = name2;
-		    //String name3 = props.getProperty("name3");
-		    //LIST_OF_NAMES[3] = name3;
-		    //String name4 = props.getProperty("name4");
-		    //LIST_OF_NAMES[4] = name4;
-		    
-		    System.out.println("The following names were read: " + name0 + " " + name1 + " " + name2);
-		    
-		    String blackList = props.getProperty("blackList");
+		    /**
+		     * DISABLE BLACK_LIST
+		     */
+		    /* String blackList = props.getProperty("blackList");
 		    BLACK_LIST = blackList.split(",");
 		    
 		    System.out.print("The following users were muted: ");
@@ -159,9 +155,12 @@ public class SimpleBot extends TelegramLongPollingBot
 		    	System.out.print(blacked + " ");
 		    }
 		    
-		    System.out.print("\n\n");
+		    System.out.print("\n\n");*/
 		    
-		    String whiteList = props.getProperty("whiteList");
+		    /**
+		     * DISABLE WHITE_LIST
+		     */
+		    /*String whiteList = props.getProperty("whiteList");
 		    WHITE_LIST = whiteList.split(",");
 		    
 		    System.out.print("The following users were added to white list: ");
@@ -170,7 +169,7 @@ public class SimpleBot extends TelegramLongPollingBot
 		    	System.out.print(whites + " ");
 		    }
 		    
-		    System.out.print("\n\n");
+		    System.out.print("\n\n");*/
 		    
 		    reader.close();
 		} 
@@ -300,7 +299,7 @@ public class SimpleBot extends TelegramLongPollingBot
 									e1.printStackTrace();
 								}
 								
-								if (publicId == 3)
+								if (publicId == countOfBlogs)
 								{
 									publicId = 0;
 								}
